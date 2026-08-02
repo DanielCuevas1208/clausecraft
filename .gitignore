@@ -1,0 +1,13 @@
+_build/
+*.install
+*.merlin
+*.annot
+*.cmt
+*.cmti
+*.cmx
+*.cmxa
+*.o
+*.a
+.opam-switch/
+.direnv/
+.DS_Store

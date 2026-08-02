@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.2
+          dune-cache: true
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-test --locked
+
+      - name: Build
+        run: opam exec -- dune build @all
+
+      - name: Test
+        run: opam exec -- dune runtest
+
+      - name: Run DIMACS demo
+        run: opam exec -- dune exec clausecraft -- solve examples/benchmarks/tiny-sat.cnf
+
+      - name: Run Sudoku demo
+        run: opam exec -- dune exec clausecraft -- sudoku examples/sudoku.sdk

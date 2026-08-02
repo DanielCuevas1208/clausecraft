@@ -1,0 +1,4 @@
+(executable
+ (name clausecraft)
+ (public_name clausecraft)
+ (libraries clausecraft unix))

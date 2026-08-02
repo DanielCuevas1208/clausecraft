@@ -1,0 +1,4 @@
+(library
+ (name clausecraft)
+ (public_name clausecraft)
+ (modules cnf solver sudoku))

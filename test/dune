@@ -1,0 +1,4 @@
+(test
+ (name test_clausecraft)
+ (libraries clausecraft alcotest)
+ (deps (source_tree ../examples)))
