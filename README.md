@@ -1,27 +1,23 @@
 # Clausecraft
 
-Clausecraft is a compact OCaml SAT solver with a Sudoku encoding demo.
+Clausecraft is an OCaml SAT solver for standard DIMACS CNF files.
 
-It reads standard DIMACS CNF files and reports satisfiable or unsatisfiable results.
+It also encodes and solves standard 9 by 9 Sudoku puzzles.
 
-This supporting project shows parser design, recursive search, independent model checks, and a practical Sudoku encoding.
+## Value
 
-## First release
+Clausecraft provides a small, readable CDCL-ready solver foundation.
 
-This release implements a DIMACS parser and a DPLL solver with unit propagation.
-
-The solver selects high-occurrence variables and explores both truth values.
-
-The Sudoku encoder uses one Boolean variable for each cell and digit.
-
-The CLI reports clause counts, search statistics, and solve time.
+The project demonstrates parsing, watched-literal propagation, recursive search, model checking, and Sudoku encoding.
 
 ## Architecture
 
 - `lib/cnf.ml` parses DIMACS headers, comments, literals, and clause terminators.
-- `lib/solver.ml` performs recursive DPLL search and unit propagation.
+- `lib/solver.ml` initializes two watches per clause for each solve call.
+- The solver queues newly assigned literals and inspects only clauses watching falsified literals.
+- The solver moves watches when possible and enqueues unit literals otherwise.
 - `lib/sudoku.ml` encodes and decodes standard 9 by 9 Sudoku puzzles.
-- `bin/main.ml` exposes the `solve` and `sudoku` commands.
+- `bin/main.ml` provides the `solve` and `sudoku` commands.
 - `test/test_clausecraft.ml` checks models with an independent clause evaluator.
 
 The library keeps parsing, solving, and Sudoku concerns separate.
@@ -30,7 +26,7 @@ The library keeps parsing, solving, and Sudoku concerns separate.
 
 Use OCaml 4.14 or newer, Dune 3.14 or newer, and Opam.
 
-Install dependencies with Opam.
+Install the locked dependencies.
 
 ```sh
 opam install . --deps-only --with-test --locked
@@ -68,7 +64,7 @@ The Sudoku command prints the solved grid and solver statistics.
 
 ## Sample output
 
-The small SAT fixture produces this stable result shape:
+The SAT command prints this result shape.
 
 ```text
 variables: 3
@@ -81,27 +77,29 @@ conflicts: 0
 solve_time_ms: <machine-dependent>
 ```
 
-The time value changes with the local machine.
+The time value depends on the local machine.
 
 The Sudoku command prints nine solved rows after its result line.
 
 ## Tests and validation
 
-Each SAT test uses a separate clause evaluator.
+Tests cover parser errors, SAT, UNSAT, empty clauses, watched-literal chains, bundled files, Sudoku, and model validity.
 
-Tests cover parser errors, SAT, UNSAT, bundled files, Sudoku, and model validity.
+Each SAT test uses a separate clause evaluator.
 
 CI runs the build, test suite, and both demos on OCaml 5.2.
 
-Local status: this workspace lacks `ocamlc`, `dune`, and `opam`.
+Local validation is limited because this workspace lacks `ocamlc`, `dune`, and `opam`.
 
-No local test, typecheck, or build result is claimed.
+The available local check was `git diff --check`.
 
 ## Limitations
 
-This first release uses full clause scans during propagation.
+The solver does not yet analyze conflicts or retain learned clauses.
 
-It does not yet implement watched literals, conflict learning, or restart scheduling.
+It does not yet schedule restarts.
+
+Variable selection still scans clauses, although propagation uses watched literals.
 
 The solver targets small and educational benchmark files.
 
@@ -109,9 +107,9 @@ The Sudoku encoder supports standard 9 by 9 puzzles only.
 
 ## Roadmap
 
-1. Add watched-literal propagation as an independent release.
-2. Add conflict analysis and learned clauses as an independent release.
-3. Add restart scheduling and a larger benchmark set as an independent release.
+1. Complete watched-literal propagation. **Complete in this release.**
+2. Add conflict analysis and learned clauses.
+3. Add restart scheduling and a larger benchmark set.
 
 ## License
 

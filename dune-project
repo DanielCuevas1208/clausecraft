@@ -6,7 +6,7 @@
  (name clausecraft)
  (synopsis "A compact OCaml SAT solver and Sudoku encoder")
  (description
-  "Clausecraft parses DIMACS CNF files, solves them with DPLL, and demonstrates Sudoku encoding.")
+  "Clausecraft parses DIMACS CNF files, solves them with watched literals, and demonstrates Sudoku encoding.")
  (depends
   (ocaml (>= 4.14))
   (dune (>= 3.14))

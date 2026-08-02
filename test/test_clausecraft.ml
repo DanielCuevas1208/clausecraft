@@ -38,6 +38,23 @@ let test_sat_model () =
       Alcotest.(check int) "all variables receive a value" 3 (List.length model);
       Alcotest.(check bool) "statistics are available" true (stats.Solver.propagations > 0)
 
+let test_watched_literal_chain () =
+  let cnf = Cnf.parse_string "p cnf 3 3\n-1 0\n-2 0\n1 2 3 0\n" in
+  match Solver.solve cnf with
+  | Solver.Unsatisfiable _ -> Alcotest.fail "expected a satisfying assignment"
+  | Solver.Satisfiable (assignment, stats) ->
+      Alcotest.(check int) "watched propagation avoids decisions" 0 stats.Solver.decisions;
+      Alcotest.(check int) "unit chain assigns every variable" 3 stats.Solver.propagations;
+      Alcotest.(check int) "last unit receives the required value" 1 (Solver.value assignment 3);
+      Alcotest.(check bool) "watched model satisfies the CNF" true (Solver.satisfies cnf assignment)
+
+let test_empty_clause_is_unsatisfiable () =
+  let cnf = Cnf.parse_string "p cnf 0 1\n0\n" in
+  match Solver.solve cnf with
+  | Solver.Satisfiable _ -> Alcotest.fail "an empty clause cannot be satisfied"
+  | Solver.Unsatisfiable stats ->
+      Alcotest.(check bool) "empty clause reports a conflict" true (stats.Solver.conflicts > 0)
+
 let test_unsat_model () =
   let cnf = Cnf.parse_string "p cnf 1 2\n1 0\n-1 0\n" in
   match Solver.solve cnf with
@@ -93,6 +110,8 @@ let () =
           Alcotest.test_case "parses DIMACS" `Quick test_dimacs_parser;
           Alcotest.test_case "rejects malformed input" `Quick test_dimacs_errors;
           Alcotest.test_case "verifies a SAT model independently" `Quick test_sat_model;
+          Alcotest.test_case "propagates through watched literals" `Quick test_watched_literal_chain;
+          Alcotest.test_case "rejects an empty clause" `Quick test_empty_clause_is_unsatisfiable;
           Alcotest.test_case "detects UNSAT" `Quick test_unsat_model;
           Alcotest.test_case "solves bundled benchmarks" `Quick test_bundled_benchmarks;
         ] );
