@@ -22,7 +22,7 @@ let test_dimacs_parser () =
   Alcotest.(check (list (list int))) "clauses" [ [ 1; -2 ]; [ 2; 3 ] ] (Cnf.clauses cnf)
 
 let test_dimacs_errors () =
-  let malformed () = Cnf.parse_string "p cnf 1 1\n1\n" in
+  let malformed () = ignore (Cnf.parse_string "p cnf 1 1\n1\n") in
   Alcotest.check_raises "unterminated clause"
     (Cnf.Parse_error "DIMACS ended before a clause terminator 0")
     malformed
